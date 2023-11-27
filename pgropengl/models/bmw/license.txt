@@ -1,0 +1,11 @@
+Model Information:
+* title:	BMW 525i
+* source:	https://sketchfab.com/3d-models/bmw-525i-0f017b95016c40b9838d2e6924252137
+* author:	Xico CGI (https://sketchfab.com/XicoCGI)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "BMW 525i" (https://sketchfab.com/3d-models/bmw-525i-0f017b95016c40b9838d2e6924252137) by Xico CGI (https://sketchfab.com/XicoCGI) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
