@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\VUT\Ing\3. semestr\PGR\opengl\pgropengl\pgropengl\glad\include;C:\SDL2\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\VUT\Ing\3. semestr\PGR\PGR\pgropengl\libs\glm-master;C:\VUT\Ing\3. semestr\PGR\PGR\pgropengl\libs\glad\include;C:\SDL2\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>C:\SDL2\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
@@ -134,12 +134,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="glad\src\glad.c" />
+    <ClCompile Include="FirstPersonCamera.cpp" />
+    <ClCompile Include="libs\glad\src\glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OrbitCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragmentShader.glsl" />
     <None Include="shaders\vertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="FirstPersonCamera.h" />
+    <ClInclude Include="OrbitCamera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
