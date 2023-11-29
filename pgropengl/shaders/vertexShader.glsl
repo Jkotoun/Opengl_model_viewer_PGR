@@ -9,6 +9,9 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 lightPos;
 
+//test
+uniform float size;
+
 out vec3 vColor;
 out vec3 vNormal;
 out vec3 vPosition;
@@ -21,7 +24,7 @@ void main() {
 	vLightPos = vec3(viewMatrix * vec4(lightPos, 1.0));
 	
 	
-	vec4 clipSpacePosition =  projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
+	vec4 clipSpacePosition =  projectionMatrix * viewMatrix * modelMatrix * vec4(size*position, 1);
 
 	gl_Position = clipSpacePosition;
 }

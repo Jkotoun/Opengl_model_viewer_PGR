@@ -8,4 +8,5 @@ public:
 
     virtual glm::mat4 getViewMatrix() const = 0;
     virtual glm::vec3 getCameraPosition() const = 0;
+    virtual void resetCamera() = 0;
 };

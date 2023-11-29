@@ -9,6 +9,7 @@ public:
 
     virtual glm::mat4 getViewMatrix() const override;
     virtual glm::vec3 getCameraPosition() const override;
+    virtual void resetCamera() override;
     void rotate(float deltaX, float deltaY);
     void zoom(float deltaZoom);
     void pan(float deltaX, float deltaY);
@@ -28,4 +29,6 @@ private:
     float panSpeed;
     const float minDistance = 1.0f;
     const float maxDistance = 100.0f;
+    glm::vec3 initTarget;
+    float initDistance;
 };

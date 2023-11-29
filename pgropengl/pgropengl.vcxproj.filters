@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Zdrojové soubory\imgui">
+      <UniqueIdentifier>{a94f4747-1805-4688-89e1-33082e5fda48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hlavičkové soubory\imgui">
+      <UniqueIdentifier>{aef326dd-fc89-4611-983b-499ec88f33fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -21,11 +27,32 @@
     <ClCompile Include="libs\glad\src\glad.c">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
-    <ClCompile Include="FirstPersonCamera.cpp">
+    <ClCompile Include="FreeLookCamera.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Zdrojové soubory</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_draw.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_impl_sdl2.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_tables.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_widgets.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_demo.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -40,11 +67,38 @@
     <ClInclude Include="Camera.h">
       <Filter>Zdrojové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="FirstPersonCamera.h">
+    <ClInclude Include="FreeLookCamera.h">
       <Filter>Zdrojové soubory</Filter>
     </ClInclude>
     <ClInclude Include="OrbitCamera.h">
       <Filter>Zdrojové soubory</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_rectpack.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_textedit.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_truetype.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imconfig.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_impl_opengl3.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_impl_sdl2.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_internal.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Hlavičkové soubory\imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,10 @@
 #include <string>
 #include <algorithm>
 
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
+
 //libs
 #include <SDL.h>
 #include <glad/glad.h>
@@ -14,7 +18,7 @@
 #include <glm/glm.hpp>
 
 //headers
-#include "FirstPersonCamera.h"
+#include "FreeLookCamera.h"
 #include "OrbitCamera.h"
 
 
@@ -30,12 +34,12 @@ GLuint gVAO = 0;
 GLuint gVBO = 0;
 GLuint gIBO = 0;
 GLuint gPipelineProgram = 0;
-enum cameraMode {FirstPerson, Orbit};
-cameraMode g_currentCameraMode = Orbit;
-SDL_bool gFirstPersonFloating = SDL_FALSE;
-FirstPersonCamera firstPersonCamera(glm::vec3(0,0,3), 0.05, 0.05);
+enum cameraMode {FreeLook, Orbit};
+cameraMode g_currentCameraMode = FreeLook;
+SDL_bool gFreeLookMode = SDL_FALSE;
+FreeLookCamera freeLookCamera(glm::vec3(0,0,3), 0.05, 0.05);
 OrbitCamera orbitCamera(glm::vec3(0, 0, 0),3, 0.05,0.05, 0.005);
-glm::vec3 lightPos(3.f, 3.0f, 0.5f);
+glm::vec3 lightPosition(3.f, 3.0f, 0.5f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
 
@@ -92,7 +96,7 @@ void InitProgram() {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	gWindow = SDL_CreateWindow("OpenGL Window", gScreenWidth/2, gScreenHeight/2, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+	gWindow = SDL_CreateWindow("OpenGL Window", gScreenWidth/4, gScreenHeight/4, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
 	if (gWindow == nullptr) {
 		std::cout << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
 		exit(1);
@@ -230,42 +234,41 @@ void CreatePipelineProgram() {
 
 void HandleInput() {
 	SDL_Event event;
-
-	static int mouseX = gScreenWidth / 2;
-	static int mouseY = gScreenHeight / 2;
 	
 	
-	if (g_currentCameraMode == FirstPerson) {
+	if (g_currentCameraMode == FreeLook) {
 		while (SDL_PollEvent(&event)) {
+
+			ImGui_ImplSDL2_ProcessEvent(&event);
+
 			if (event.type == SDL_MOUSEBUTTONDOWN) {
 				if(event.button.button == SDL_BUTTON_RIGHT){
-					std::cout<<"RIGHT BUTTON"<<std::endl;
-					gFirstPersonFloating = SDL_TRUE;
+					gFreeLookMode = SDL_TRUE;
 				}
 			}
-			if (gFirstPersonFloating == SDL_TRUE) {
+			if (gFreeLookMode == SDL_TRUE) {
 				if (event.type == SDL_MOUSEMOTION) {
-					firstPersonCamera.mouseLook(glm::vec2(-event.motion.xrel, -event.motion.yrel));
+					freeLookCamera.mouseLook(glm::vec2(-event.motion.xrel, -event.motion.yrel));
 				}
 			}
 		}
 
 		const Uint8* state = SDL_GetKeyboardState(NULL);
-		if (gFirstPersonFloating == SDL_TRUE) {
+		if (gFreeLookMode == SDL_TRUE) {
 			if (state[SDL_SCANCODE_W]) {
-				firstPersonCamera.MoveForward();
+				freeLookCamera.MoveForward();
 			}
 			if (state[SDL_SCANCODE_S]) {
-				firstPersonCamera.MoveBackward();
+				freeLookCamera.MoveBackward();
 			}
 			if (state[SDL_SCANCODE_A]) {
-				firstPersonCamera.MoveLeft();
+				freeLookCamera.MoveLeft();
 			}
 			if (state[SDL_SCANCODE_D]) {
-				firstPersonCamera.MoveRight();
+				freeLookCamera.MoveRight();
 			}
 			if (state[SDL_SCANCODE_ESCAPE]) {
-				gFirstPersonFloating = SDL_FALSE;
+				gFreeLookMode = SDL_FALSE;
 			}
 		}
 		else {
@@ -273,10 +276,10 @@ void HandleInput() {
 	}
 	else if (g_currentCameraMode == Orbit) {
 		while (SDL_PollEvent(&event)) {
+			ImGui_ImplSDL2_ProcessEvent(&event);
 
 			//scroll up
 			if (event.type == SDL_MOUSEWHEEL) {
-				std::cout<<event.wheel.y<<std::endl;
 				orbitCamera.zoom(event.wheel.y);
 			}
 
@@ -313,7 +316,7 @@ void HandleInput() {
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 	}
 }
-
+float size = 1.0f;
 void Draw() {
 
 	glEnable(GL_DEPTH_TEST);
@@ -321,49 +324,110 @@ void Draw() {
 	glViewport(0, 0, gScreenWidth, gScreenHeight);
 	glClearColor(0.16, 0.16, 0.16, 1.f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	
+
+	
 	glUseProgram(gPipelineProgram);
-
-
-
 	glm::mat4 modelMatrix = glm::mat4(1.f);
-
 	//TODO volba kamery uniformní promìnnou
 
 	glm::mat4 viewMatrix;
-	if (g_currentCameraMode == FirstPerson) {
-		viewMatrix = firstPersonCamera.getViewMatrix();
+	if (g_currentCameraMode == FreeLook) {
+		viewMatrix = freeLookCamera.getViewMatrix();
 	}
 	else if (g_currentCameraMode == Orbit) {
 		viewMatrix = orbitCamera.getViewMatrix();
 	}
 
 
-	glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(45.f), (float)gScreenWidth / (float)gScreenHeight, 0.1f, 100.f);
 
+
+	glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(45.f), (float)gScreenWidth / (float)gScreenHeight, 0.1f, 100.f);
 	glUniformMatrix4fv(glGetUniformLocation(gPipelineProgram, "modelMatrix"),1,GL_FALSE,&modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(gPipelineProgram, "viewMatrix"), 1, GL_FALSE, &viewMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(gPipelineProgram, "projectionMatrix"), 1, GL_FALSE, &perspectiveMatrix[0][0]);
-
-	glUniform3fv(glGetUniformLocation(gPipelineProgram, "lightPos"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(gPipelineProgram, "lightPos"), 1, &lightPosition[0]);
 	glUniform3fv(glGetUniformLocation(gPipelineProgram, "lightColor"), 1, &lightColor[0]);
-
+	glUniform1f(glGetUniformLocation(gPipelineProgram, "size"), size);
 	glBindVertexArray(gVAO);
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+
+
 }
 
 
 void MainLoop() {
 	SDL_WarpMouseInWindow(gWindow, gScreenWidth / 2, gScreenHeight / 2);
+	
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;\
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForOpenGL(gWindow, gOpenGLContext);
+	ImGui_ImplOpenGL3_Init("#version 460");
+	
 	while (!gQuit) {
-		SDL_SetRelativeMouseMode(gFirstPersonFloating);
+		SDL_SetRelativeMouseMode(gFreeLookMode);
 
 		HandleInput();
 		Draw();
 		//update window every frame
+
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame(gWindow);
+
+		ImGui::NewFrame();
+		{
+			ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+			ImGui::SetNextWindowSize(
+				ImVec2(350, 500),
+				ImGuiCond_Always
+			);
+			ImGui::Begin("Settings");
+
+			ImGui::Text("Camera mode");
+			ImGui::RadioButton("Free Look", (int*)&g_currentCameraMode, FreeLook);
+			ImGui::RadioButton("Orbit", (int*)&g_currentCameraMode, Orbit);
+
+			ImGui::Text("Camera options");
+			if (g_currentCameraMode == FreeLook) {
+				ImGui::BulletText("Right click to enter free look mode");
+				ImGui::BulletText("WASD to move");
+				ImGui::BulletText("ESC to exit free look mode");
+			}
+			else if (g_currentCameraMode == Orbit) {
+				ImGui::BulletText("Left click to rotate");
+				ImGui::BulletText("Right click to pan");
+				ImGui::BulletText("Scroll to zoom");
+			}
+
+
+			ImGui::SliderFloat("Size", &size, 0.0f, 2.0f);
+			if (ImGui::Button("Reset Camera")) {
+				if (g_currentCameraMode == FreeLook) {
+					freeLookCamera.resetCamera();
+				}
+				else if (g_currentCameraMode == Orbit) {
+					orbitCamera.resetCamera();
+				}
+			}
+			ImGui::ColorEdit3("Light Color", &lightColor[0]);
+			ImGui::SliderFloat3("Light Position", &lightPosition[0], -10.0f, 10.0f);
+			ImGui::End();
+		}
+
+		
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		SDL_GL_SwapWindow(gWindow);
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void CleanUp() {
