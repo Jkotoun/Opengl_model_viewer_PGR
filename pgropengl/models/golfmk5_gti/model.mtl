@@ -1,0 +1,50 @@
+# exported by https://3dviewer.net
+newmtl material
+Kd 0 0 0
+d 1
+newmtl Nuovo.9
+Kd 0.8431372549019608 0 0
+d 1
+newmtl Nuovo.6
+Kd 0.27058823529411763 0.27058823529411763 0.27058823529411763
+d 1
+newmtl Nuovo.12
+Kd 0.8941176470588236 0.8941176470588236 0.8941176470588236
+d 1
+newmtl Nuovo.2
+Kd 1 1 1
+d 1
+map_Kd Nuovo.2_baseColor.png
+newmtl Nuovo.3
+Kd 1 1 1
+d 1
+map_Kd Nuovo.3_baseColor.png
+newmtl Nuovo.4
+Kd 1 1 1
+d 1
+map_Kd Nuovo.4_baseColor.png
+newmtl Nuovo.8
+Kd 1 1 1
+d 1
+map_Kd Nuovo.8_baseColor.png
+newmtl Nuovo.1
+Kd 1 1 1
+d 1
+map_Kd Nuovo.1_baseColor.png
+newmtl Nuovo
+Kd 0 0 0
+d 1
+newmtl Nuovo.13
+Kd 1 1 1
+d 1
+map_Kd Nuovo.13_baseColor.png
+newmtl Nuovo.5
+Kd 0 0 0
+d 0.6920194393897973
+newmtl Nuovo.11
+Kd 0 0 0
+d 1
+newmtl Nuovo.10
+Kd 1 1 1
+d 1
+map_Kd Nuovo.10_baseColor.png

@@ -14,10 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Zdrojové soubory\imgui">
-      <UniqueIdentifier>{a94f4747-1805-4688-89e1-33082e5fda48}</UniqueIdentifier>
+      <UniqueIdentifier>{d0d0a08b-a9a2-4708-9aee-e2205fe2f3c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Hlavičkové soubory\imgui">
-      <UniqueIdentifier>{aef326dd-fc89-4611-983b-499ec88f33fa}</UniqueIdentifier>
+    <Filter Include="Soubory zdrojů\imgui">
+      <UniqueIdentifier>{aafea3da-9127-4dc5-a08b-3f2c2426fa0c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +33,15 @@
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_widgets.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imgui\imgui_demo.cpp">
+      <Filter>Zdrojové soubory\imgui</Filter>
+    </ClCompile>
     <ClCompile Include="libs\imgui\imgui_draw.cpp">
       <Filter>Zdrojové soubory\imgui</Filter>
     </ClCompile>
@@ -43,15 +52,6 @@
       <Filter>Zdrojové soubory\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libs\imgui\imgui_tables.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_widgets.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui.cpp">
-      <Filter>Zdrojové soubory\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_demo.cpp">
       <Filter>Zdrojové soubory\imgui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -73,32 +73,38 @@
     <ClInclude Include="OrbitCamera.h">
       <Filter>Zdrojové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="libs\imgui\imstb_rectpack.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
+    <ClInclude Include="mesh.h">
+      <Filter>Zdrojové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="libs\imgui\imstb_textedit.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\imgui\imstb_truetype.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\imgui\imconfig.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
+    <ClInclude Include="model.h">
+      <Filter>Zdrojové soubory</Filter>
     </ClInclude>
     <ClInclude Include="libs\imgui\imgui.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
+      <Filter>Soubory zdrojů\imgui</Filter>
     </ClInclude>
     <ClInclude Include="libs\imgui\imgui_impl_opengl3.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\imgui\imgui_impl_sdl2.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\imgui\imgui_internal.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
+      <Filter>Soubory zdrojů\imgui</Filter>
     </ClInclude>
     <ClInclude Include="libs\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Hlavičkové soubory\imgui</Filter>
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_impl_sdl2.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imgui_internal.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_rectpack.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_textedit.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imstb_truetype.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\imgui\imconfig.h">
+      <Filter>Soubory zdrojů\imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
