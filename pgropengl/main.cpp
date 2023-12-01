@@ -122,8 +122,8 @@ GLuint CompileShader(GLuint type, const std::string& src) {
 
 void CreatePipelineProgram() {
 
-	std::string vsSrc = loadShaderFile("shaders/vertexShader.glsl");
-	std::string fsSrc = loadShaderFile("shaders/fragmentShader.glsl");
+	std::string vsSrc = loadShaderFile("shaders/modelVS.glsl");
+	std::string fsSrc = loadShaderFile("shaders/modelFS.glsl");
 	gPipelineProgram = glCreateProgram();
 	GLuint vs = CompileShader(GL_VERTEX_SHADER, vsSrc);
 	GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fsSrc);
@@ -228,7 +228,7 @@ void Draw(Model &testModel) {
 
 
 	glViewport(0, 0, gScreenWidth, gScreenHeight);
-	glClearColor(0.55, 0.71, 0.18, 1.f);
+	glClearColor(0.15, 0.15, 0.15, 1.f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	//enable blending

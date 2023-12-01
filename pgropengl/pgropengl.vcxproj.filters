@@ -56,14 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragmentShader.glsl">
-      <Filter>Zdrojové soubory</Filter>
-    </None>
-    <None Include="shaders\vertexShader.glsl">
-      <Filter>Zdrojové soubory</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Camera.h">
       <Filter>Zdrojové soubory</Filter>
     </ClInclude>
@@ -106,5 +98,13 @@
     <ClInclude Include="libs\imgui\imconfig.h">
       <Filter>Soubory zdrojů\imgui</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\modelFS.glsl">
+      <Filter>Zdrojové soubory</Filter>
+    </None>
+    <None Include="shaders\modelVS.glsl">
+      <Filter>Zdrojové soubory</Filter>
+    </None>
   </ItemGroup>
 </Project>

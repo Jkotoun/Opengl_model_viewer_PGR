@@ -147,10 +147,6 @@
     <ClCompile Include="OrbitCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragmentShader.glsl" />
-    <None Include="shaders\vertexShader.glsl" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FreeLookCamera.h" />
     <ClInclude Include="libs\imgui\imconfig.h" />
@@ -165,6 +161,10 @@
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="OrbitCamera.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\modelFS.glsl" />
+    <None Include="shaders\modelVS.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

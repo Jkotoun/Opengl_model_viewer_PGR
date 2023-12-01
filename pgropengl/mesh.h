@@ -1,90 +1,61 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
-#include <glad/glad.h> // holds all OpenGL type declarations
-
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-
 #include <string>
 #include <vector>
-using namespace std;
-
-#define MAX_BONE_INFLUENCE 4
 
 struct Vertex {
-    // position
     glm::vec3 Position;
-    // normal
     glm::vec3 Normal;
-    // texCoords
     glm::vec2 TexCoords;
-
     glm::vec4 Color;
-
     float useDiffuseTexture;
 };
 
 struct Texture {
     unsigned int id;
-    string type;
-    string path;
+    std::string type;
+    std::string path;
 };
 
 class Mesh {
 public:
-    vector<Vertex>       vertices;
-    vector<unsigned int> indices;
-    vector<Texture>      textures;
+    std::vector<Vertex>       vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture>      textures;
+    bool isTransparent;
     unsigned int VAO;
 
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, bool isTransparent)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->isTransparent = isTransparent;
 
-        setupMesh();
+        setupOpenGLBuffers();
     }
 
     void Draw(GLuint pipelineProgramId)
     {
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr = 1;
-        unsigned int heightNr = 1;
         for (unsigned int i = 0; i < textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i); 
-            string number;
-            string name = textures[i].type;
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            //else if (name == "texture_specular")
-            //    number = std::to_string(specularNr++); // transfer unsigned int to string
-            //else if (name == "texture_normal")
-            //    number = std::to_string(normalNr++); // transfer unsigned int to string
-            //else if (name == "texture_height") 
-            //    number = std::to_string(heightNr++); // transfer unsigned int to string
-
-
-            glUniform1i(glGetUniformLocation(pipelineProgramId, (name + number).c_str()), i);
+            glUniform1i(glGetUniformLocation(pipelineProgramId, ("texture_diffuse" + std::to_string(i)).c_str()), i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-
         glActiveTexture(GL_TEXTURE0);
-
-
     }
 
 private:
     unsigned int VBO, EBO;
-    void setupMesh()
+    void setupOpenGLBuffers()
     {
 
         glCreateVertexArrays(1, &VAO);
@@ -131,4 +102,3 @@ private:
         glBindVertexArray(0);
     }
 };
-#endif

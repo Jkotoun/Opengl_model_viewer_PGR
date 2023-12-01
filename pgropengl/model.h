@@ -1,61 +1,65 @@
 #pragma once
-#ifndef MODEL_H
-#define MODEL_H
 
 #include <glad/glad.h> 
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
 #include "mesh.h"
-
-
-
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <map>
 #include <vector>
-using namespace std;
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
+unsigned int TextureFromFile(const char* path, const std::string& directory);
 
 class Model
 {
 public:
-    vector<Texture> textures_loaded;	
-    vector<Mesh>    meshes;
-    string directory;
-    bool gammaCorrection;
+    std::vector<Mesh> opaqueMeshes;
+    std::vector<Mesh> transparentMeshes;
+    std::string directory;
 
-    Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
+    Model(std::string const& path) 
     {
         loadModel(path);
     }
 
-    void Draw(GLuint pipelineProgramId)
-    {
-        for (unsigned int i = 0; i < meshes.size(); i++)
-            meshes[i].Draw(pipelineProgramId);
-    }
+    void Draw(GLuint pipelineProgramId) 
+	{
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+
+        for (unsigned int i = 0; i < opaqueMeshes.size(); i++) {
+            opaqueMeshes[i].Draw(pipelineProgramId);
+        }
+
+        glDepthMask(GL_FALSE);
+
+        for (unsigned int i = 0; i < transparentMeshes.size(); i++) {
+            transparentMeshes[i].Draw(pipelineProgramId);
+        }
+        glDepthMask(GL_TRUE);
+	}
 
 private:
-    void loadModel(string const& path)
+    void loadModel(std::string const& path)
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
         {
-            cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+           std::cout << importer.GetErrorString() << std::endl;
             return;
         }
+
         // retrieve the directory path of the filepath - we assume that textures are in same directory
         directory = path.substr(0, path.find_last_of('/'));
-
         processNode(scene->mRootNode, scene);
     }
 
@@ -63,8 +67,16 @@ private:
     {
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(processMesh(mesh, scene));
+            Mesh m = processMesh(scene->mMeshes[node->mMeshes[i]], scene);
+            if (m.isTransparent)
+			{
+				transparentMeshes.push_back(m);
+			}
+			else
+			{
+				opaqueMeshes.push_back(m);
+			}
+
         }
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
@@ -75,11 +87,30 @@ private:
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene)
     {
-        vector<Vertex> vertices;
-        vector<unsigned int> indices;
-        vector<Texture> textures;
+        std::vector<Vertex> vertices;
+        std::vector<unsigned int> indices;
+        std::vector<Texture> textures;
+        const auto& mat = scene->mMaterials[mesh->mMaterialIndex];
 
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+        glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
+        float useDiffuseTexture = 0.f;
+        aiColor4D diffuse;
+        float alpha;
+        if (aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse) == AI_SUCCESS && aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &alpha) == AI_SUCCESS)
+        {
+            color= glm::vec4(diffuse.r, diffuse.g, diffuse.b, alpha);
+        }
+
+        if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+        {
+            useDiffuseTexture = 1.f;
+        }
+        else
+        {
+            useDiffuseTexture = 0.f;
+        }
+
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
             glm::vec3 vector; 
@@ -102,31 +133,11 @@ private:
                 vec.y = mesh->mTextureCoords[0][i].y;
                 vertex.TexCoords = vec;
             }
-            else
+            else {
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-
-
-            //todo what does the condition mean?
-  /*          if (scene->mNumMaterials > mesh->mMaterialIndex)
-            {*/
-            const auto& mat = scene->mMaterials[mesh->mMaterialIndex];
-            aiColor4D diffuse;
-            if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-            {
-                vertex.Color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
             }
-
-            if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-            {
-                vertex.useDiffuseTexture = 1.f;
-            }
-            else
-            {
-                vertex.useDiffuseTexture = 0.f;
-            }
-            //}
-
-
+            vertex.Color = color;
+            vertex.useDiffuseTexture = useDiffuseTexture;
             vertices.push_back(vertex);
         }
 
@@ -140,51 +151,36 @@ private:
         }
 
 
+        if (useDiffuseTexture == 1.f)
+        {
+            std::vector<Texture> diffuseMaps = loadMaterialTextures(mat, aiTextureType_DIFFUSE, "texture_diffuse");
+            textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        }
 
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        
-        
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-        return Mesh(vertices, indices, textures);
+        return Mesh(vertices, indices, textures, alpha<1.f);
     }
 
-    vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName)
+    std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
     {
-        vector<Texture> textures;
+        std::vector<Texture> textures;
         for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
             mat->GetTexture(type, i, &str);
-            bool skip = false;
-            for (unsigned int j = 0; j < textures_loaded.size(); j++)
-            {
-                if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
-                {
-                    textures.push_back(textures_loaded[j]);
-                    skip = true;
-                    break;
-                }
-            }
-            if (!skip)
-            {   // if texture hasn't been loaded already, load it
-                Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
-            }
+            Texture texture;
+            texture.id = TextureFromFile(str.C_Str(), this->directory);
+            texture.type = typeName;
+            texture.path = str.C_Str();
+            textures.push_back(texture);
         }
         return textures;
     }
 };
 
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma)
+unsigned int TextureFromFile(const char* path, const std::string& directory)
 {
-    string filename = string(path);
+    std::string filename = std::string(path);
     filename = directory + '/' + filename;
 
     unsigned int textureID;
@@ -215,10 +211,9 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
+        std::cout << "Failed to load texture at " << path << std::endl;
         stbi_image_free(data);
     }
 
     return textureID;
 }
-#endif
