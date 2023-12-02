@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cliff's Mercedes V8 Biturbo
+* source:	https://sketchfab.com/3d-models/cliffs-mercedes-v8-biturbo-f8c2e4a26fad4b139aa7b69d44b9b8b1
+* author:	Libau Media (https://sketchfab.com/robinmikart)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cliff's Mercedes V8 Biturbo" (https://sketchfab.com/3d-models/cliffs-mercedes-v8-biturbo-f8c2e4a26fad4b139aa7b69d44b9b8b1) by Libau Media (https://sketchfab.com/robinmikart) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

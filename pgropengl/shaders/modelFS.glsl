@@ -42,5 +42,22 @@ void main() {
 	}
 
 	vec3 col = phong(tmpFragColr,vPosition,vNormal,vLightPos,lightColor);
-	fColor = vec4(col, tmpFragColr.a);
+	float alpha;
+	
+	if(vUseDiffuseTexture == 1.f){
+		//if texture has alpha channel, use it
+		if(tmpFragColr.a == 1.f){
+			alpha = vColor.a;
+		}
+		//otherwise use the	color alpha obtained by assimp as material opacity prop
+		else{
+			alpha = tmpFragColr.a;
+		}
+	}
+	else{
+		alpha = vColor.a;
+	}
+
+
+	fColor = vec4(col, alpha);
 }

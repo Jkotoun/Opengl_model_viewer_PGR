@@ -61,47 +61,49 @@ private:
 
         // retrieve the directory path of the filepath - we assume that textures are in same directory
         directory = path.substr(0, path.find_last_of('/'));
-        processNode(scene->mRootNode, scene);
+        processAssimpNode(scene->mRootNode, scene);
     }
 
-    void processNode(aiNode* node, const aiScene* scene)
+    void processAssimpNode(aiNode* node, const aiScene* scene)
     {
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-            Mesh m = processMesh(scene->mMeshes[node->mMeshes[i]], scene);
+            Mesh m = processAssimpMesh(scene->mMeshes[node->mMeshes[i]], scene);
             //separate meshes into transparent and opaque
             if (m.isTransparent)
-			{
-				transparentMeshes.push_back(m);
-			}
-			else
-			{
-				opaqueMeshes.push_back(m);
-			}
+            {
+                transparentMeshes.push_back(m);
+            }
+            else
+            {
+                opaqueMeshes.push_back(m);
+            }
 
         }
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            processNode(node->mChildren[i], scene);
+            processAssimpNode(node->mChildren[i], scene);
         }
     }
 
-    Mesh processMesh(aiMesh* mesh, const aiScene* scene)
+    //process assimp mesh to Mesh class
+    Mesh processAssimpMesh(aiMesh* mesh, const aiScene* scene)
     {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::vector<Texture> textures;
+        Texture texture;
         const auto& mat = scene->mMaterials[mesh->mMaterialIndex];
 
         glm::vec4 color = glm::vec4(1.f, 1.f, 1.f, 1.f);
         float useDiffuseTexture = 0.f;
         aiColor4D diffuse;
-        float alpha;
-        
+        float alpha = 1.f;
+
         if (aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse) == AI_SUCCESS && aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &alpha) == AI_SUCCESS)
         {
-            color= glm::vec4(diffuse.r, diffuse.g, diffuse.b, alpha);
+            color = glm::vec4(diffuse.r, diffuse.g, diffuse.b, alpha);
         }
+
         //material can have file texture or just plain color
         if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
         {
@@ -116,7 +118,7 @@ private:
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
-            glm::vec3 vector; 
+            glm::vec3 vector;
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
@@ -129,7 +131,7 @@ private:
                 vertex.Normal = vector;
             }
             //limitation for only one texturing coordinate set
-            if (mesh->mTextureCoords[0]) 
+            if (mesh->mTextureCoords[0])
             {
                 glm::vec2 vec;
                 vec.x = mesh->mTextureCoords[0][i].x;
@@ -150,31 +152,22 @@ private:
             for (unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
-
         if (useDiffuseTexture == 1.f)
         {
-            std::vector<Texture> diffuseMaps = loadMaterialTextures(mat, aiTextureType_DIFFUSE, "texture_diffuse");
-            textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+            texture = loadMaterialTexture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
         }
-
-        return Mesh(vertices, indices, textures, alpha<1.f);
+        return Mesh(vertices, indices, texture, useDiffuseTexture, alpha < 1.f );
     }
 
     //load all textures for given material
-    std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+    Texture loadMaterialTexture(aiMaterial* mat, aiTextureType type, std::string typeName)
     {
-        std::vector<Texture> textures;
-        for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-        {
-            aiString str;
-            mat->GetTexture(type, i, &str);
-            Texture texture;
-            texture.id = TextureFromFile(str.C_Str(), this->directory);
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-        }
-        return textures;
+        Texture texture;
+        aiString str;
+        mat->GetTexture(type, 0, &str);
+        texture.id = TextureFromFile(str.C_Str(), this->directory);
+        texture.path = str.C_Str();
+        return texture;
     }
 };
 
@@ -189,21 +182,21 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
-    int width, height, nrComponents;
+    int texWidth, texHeight, texChannelsCount;
     //load img using stbi library and bind it as texture
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(filename.c_str(), &texWidth, &texHeight, &texChannelsCount, 0);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
+        GLenum format = GL_RGBA;
+        if (texChannelsCount == 1)
             format = GL_RED;
-        else if (nrComponents == 3)
+        else if (texChannelsCount == 3)
             format = GL_RGB;
-        else if (nrComponents == 4)
+        else if (texChannelsCount == 4)
             format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

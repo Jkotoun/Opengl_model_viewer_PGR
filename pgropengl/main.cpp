@@ -46,7 +46,7 @@ bool gQuit = false;
 enum cameraMode {FreeLook, Orbit}; 
 cameraMode g_currentCameraMode = Orbit;
 SDL_bool gFreeLookMode = SDL_FALSE;
-FreeLookCamera freeLookCamera(glm::vec3(0,0,3),1, 0.05);
+FreeLookCamera freeLookCamera(glm::vec3(0,0,3),0.05, 0.05);
 OrbitCamera orbitCamera(glm::vec3(0, 0, 0),3, 0.05,0.05, 0.005);
 
 //projections
@@ -54,7 +54,7 @@ enum projectionMode {Perspective, Orthographic};
 projectionMode g_currentProjectionMode = Perspective;
 
 //models
-enum modelsEnum {Octavia, GolfMk1, GolfMk5, AudiA4};
+enum modelsEnum {Octavia, GolfMk1, GolfMk5, AudiA4, MercedesV8};
 modelsEnum g_currentModel = GolfMk1;
 
 //other GUI globals
@@ -228,7 +228,7 @@ void Draw(Model &model, glm::mat4 &modelMatrix) {
 
 	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, gScreenWidth, gScreenHeight);
-	glClearColor(0.15, 0.15, 0.15, 1.f);
+	glClearColor(0.85, 0.85, 0.85, 1.f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
@@ -296,9 +296,10 @@ glm::mat4 computeModelMatrix(Model& model) {
 
 	float translateY = -(miny + maxy) / 2.f;
 	float translateX = -(minx + maxx) / 2.f;
+	float translateZ = -(minz + maxz) / 2.f;
 	// Create scale matrix
 	glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(translateX, translateY, 0));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(translateX, translateY, translateZ));
 	return modelMatrix;
 }
 
@@ -319,6 +320,8 @@ void MainLoop() {
 	modelPaths.emplace(GolfMk1, "models/golfmk1_obj/model.obj");
 	modelPaths.emplace(GolfMk5, "models/golfmk5_gti/model.obj");
 	modelPaths.emplace(AudiA4, "models/audia4/model.obj");
+	modelPaths.emplace(MercedesV8, "models/mercedesv8/scene.gltf");
+
 	models.emplace(GolfMk1, new Model(modelPaths.find(GolfMk1)->second));
 
 	modelsEnum prevModel = g_currentModel;
@@ -338,7 +341,7 @@ void MainLoop() {
 			);
 			ImGui::Begin("Settings");
 			ImGui::Text("Model");
-			ImGui::Combo("Model", (int*)&g_currentModel, "Skoda Octavia\0Volkswagen Golf Mk1\0Volkswagen Golf Mk5\0Audi A4\0\0");
+			ImGui::Combo("Model", (int*)&g_currentModel, "Skoda Octavia\0Volkswagen Golf Mk1\0Volkswagen Golf Mk5\0Audi A4\0Mercedes V8 Biturbo\0\0");
 
 			if(prevModel != g_currentModel){
 				prevModel = g_currentModel;
@@ -363,14 +366,19 @@ void MainLoop() {
 				}
 			}
 
-
 			ImGui::Text("Projection mode");
 			ImGui::RadioButton("Perspective", (int*)&g_currentProjectionMode, Perspective);
 			ImGui::RadioButton("Orthographic", (int*)&g_currentProjectionMode, Orthographic);
 
 			ImGui::Text("Camera mode");
 			ImGui::RadioButton("Orbit", (int*)&g_currentCameraMode, Orbit);
-			ImGui::RadioButton("Free Look", (int*)&g_currentCameraMode, FreeLook);
+
+			if (g_currentProjectionMode == Perspective) {
+				ImGui::RadioButton("Free Look", (int*)&g_currentCameraMode, FreeLook);
+			}
+			else {
+				g_currentCameraMode = Orbit;
+			}
 
 			ImGui::Text("Camera options");
 			if (g_currentCameraMode == FreeLook) {
@@ -394,7 +402,7 @@ void MainLoop() {
 				}
 			}
 			ImGui::ColorEdit3("Light Color", &lightColor[0]);
-			ImGui::SliderFloat3("Light Position", &lightPosition[0], -50.0f, 50.0f);
+			ImGui::SliderFloat3("Light Position", &lightPosition[0], -100.0f, 100.0f);
 			ImGui::End();
 		}
 
@@ -417,7 +425,6 @@ int main(int argc, char* argv[]) {
 
 	//load and compile shaders and create pipeline program
 	CreatePipelineProgram();
-
 
 	MainLoop();
 	

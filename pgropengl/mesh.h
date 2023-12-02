@@ -19,7 +19,6 @@ struct Vertex {
 
 struct Texture {
     unsigned int id;
-    std::string type;
     std::string path;
 };
 
@@ -27,27 +26,28 @@ class Mesh {
 public:
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture>      textures;
+    bool hasTexture;
+    Texture      texture;
     bool isTransparent;
     unsigned int VAO;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, bool isTransparent)
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Texture texture, bool hasTexture, bool isTransparent)
     {
         this->vertices = vertices;
         this->indices = indices;
-        this->textures = textures;
+        this->texture = texture;
         this->isTransparent = isTransparent;
+        this->hasTexture = hasTexture;
 
         setupOpenGLBuffers();
     }
 
     void Draw(GLuint pipelineProgramId)
     {
-        for (unsigned int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); 
-            glUniform1i(glGetUniformLocation(pipelineProgramId, ("texture_diffuse" + std::to_string(i)).c_str()), i);
-            glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        if (this->hasTexture) {
+            glActiveTexture(GL_TEXTURE0);
+            glUniform1i(glGetUniformLocation(pipelineProgramId, "texture_diffuse0"), 0);
+            glBindTexture(GL_TEXTURE_2D, texture.id);
         }
 
         glBindVertexArray(VAO);
