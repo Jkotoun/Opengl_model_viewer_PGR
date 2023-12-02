@@ -363,6 +363,10 @@ void MainLoop() {
 				//recompute model matrix for selected model
 				else {
 					modelMatrix = computeModelMatrix(*models.find(g_currentModel)->second);
+					if (g_currentModel == GolfMk5) {
+						//golf mk5 is rotated 180 degrees
+						modelMatrix = glm::rotate(modelMatrix, glm::radians(180.f), glm::vec3(0, 1, 0));
+					}
 				}
 			}
 
