@@ -3,8 +3,8 @@
 
 	OrbitCamera::OrbitCamera(glm::vec3 target, float distance, float rotationSpeed, float zoomSpeed, float panSpeed)
 		: target(target), distance(distance), rotationSpeed(rotationSpeed), zoomSpeed(zoomSpeed), panSpeed(panSpeed) {
-		azimuth = 0.0f;
-		elevation = 0.0f;
+		azimuth = 45.0f;
+		elevation = 20.0f;
 		initDistance = distance;
 		initTarget = target;
 		updateCameraPosition();
@@ -18,8 +18,8 @@
 		return eye;
 	}
 	void OrbitCamera::resetCamera() {
-		azimuth = 0.0f;
-		elevation = 0.0f;
+		azimuth = 45.0f;
+		elevation = 20.0f;
 		distance = initDistance;
 		target = initTarget;
 		updateCameraPosition();

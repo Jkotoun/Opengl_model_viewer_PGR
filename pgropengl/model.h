@@ -15,7 +15,8 @@
 #include <vector>
 
 unsigned int TextureFromFile(const char* path, const std::string& directory);
-
+//inspired by learnopengl tutorial - basic concept of loading model using assimp
+//https://learnopengl.com/Model-Loading/Assimp
 class Model
 {
 public:
@@ -34,13 +35,12 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-
+        //draw opaque meshes first and then transparent meshes to blend correctly
         for (unsigned int i = 0; i < opaqueMeshes.size(); i++) {
             opaqueMeshes[i].Draw(pipelineProgramId);
         }
 
         glDepthMask(GL_FALSE);
-
         for (unsigned int i = 0; i < transparentMeshes.size(); i++) {
             transparentMeshes[i].Draw(pipelineProgramId);
         }
@@ -51,7 +51,8 @@ private:
     void loadModel(std::string const& path)
     {
         Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+        //pretransform vertices for some formats to work correctly (like gltf)
+        const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_PreTransformVertices);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
         {
            std::cout << importer.GetErrorString() << std::endl;
@@ -68,6 +69,7 @@ private:
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             Mesh m = processMesh(scene->mMeshes[node->mMeshes[i]], scene);
+            //separate meshes into transparent and opaque
             if (m.isTransparent)
 			{
 				transparentMeshes.push_back(m);
@@ -82,7 +84,6 @@ private:
         {
             processNode(node->mChildren[i], scene);
         }
-
     }
 
     Mesh processMesh(aiMesh* mesh, const aiScene* scene)
@@ -96,11 +97,12 @@ private:
         float useDiffuseTexture = 0.f;
         aiColor4D diffuse;
         float alpha;
+        
         if (aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse) == AI_SUCCESS && aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &alpha) == AI_SUCCESS)
         {
             color= glm::vec4(diffuse.r, diffuse.g, diffuse.b, alpha);
         }
-
+        //material can have file texture or just plain color
         if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
         {
             useDiffuseTexture = 1.f;
@@ -110,7 +112,8 @@ private:
             useDiffuseTexture = 0.f;
         }
 
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+        //just copy vertices, normals and texture coordinates to internal structures
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
             glm::vec3 vector; 
@@ -141,15 +144,12 @@ private:
             vertices.push_back(vertex);
         }
 
-
-
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
-
 
         if (useDiffuseTexture == 1.f)
         {
@@ -160,6 +160,7 @@ private:
         return Mesh(vertices, indices, textures, alpha<1.f);
     }
 
+    //load all textures for given material
     std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
     {
         std::vector<Texture> textures;
@@ -180,6 +181,8 @@ private:
 
 unsigned int TextureFromFile(const char* path, const std::string& directory)
 {
+
+    //path to texture is relative to model file
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
 
@@ -187,6 +190,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
+    //load img using stbi library and bind it as texture
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {

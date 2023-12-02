@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+//inspired by learnopengl tutorial - basic concept of loading model using assimp
+//https://learnopengl.com/Model-Loading/Assimp
+
 struct Vertex {
     glm::vec3 Position;
     glm::vec3 Normal;
